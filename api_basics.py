@@ -1,4 +1,8 @@
- 
+# ============================================================ 
+# api and chatbot beginner notes 
+# file name: api_chatbot.py 
+# ============================================================
+
 # an API is a way for one program to communicate with another program.
 # API means application programming interface.
 
@@ -205,4 +209,135 @@ def delete_enrollment(year: int):
 # delete     -> remove data
 # fastapi    -> python tool for building apis
 # uvicorn    -> server that runs the api
+
+
+# ============================================================
+# chatbot beginner notes
+# file name: chatbot.py
+# ============================================================
+
+# this chatbot asks the user a question.
+# it finds the year in the question.
+# then it sends that year to the api.
+# then it prints the api answer.
+
+# the api must be running before this chatbot runs.
+
+import requests
+
+
+# ============================================================
+# 1. api url
+# ============================================================
+
+# this is the endpoint from api_chatbot.py.
+# the chatbot will send requests to this address.
+
+api_url = "http://127.0.0.1:8000/students/enrollment"
+
+
+# ============================================================
+# 2. ask api function
+# ============================================================
+
+# this function sends a year to the api.
+# params={"year": year} creates this kind of url:
+# http://127.0.0.1:8000/students/enrollment?year=2025
+
+def ask_api(year):
+
+    response = requests.get(
+        api_url,
+        params={"year": year}
+    )
+
+    return response.json()
+
+
+# ============================================================
+# 3. get user question
+# ============================================================
+
+# input() asks the user to type something.
+
+question = input("ask me: ")
+
+
+# ============================================================
+# 4. find the year in the question
+# ============================================================
+
+# start with no year.
+# then check each word in the question.
+# if a word is a number, convert it to integer.
+
+year = None
+
+for word in question.split():
+
+    word = word.replace("?", "")
+    word = word.replace(".", "")
+    word = word.replace(",", "")
+
+    if word.isdigit():
+        year = int(word)
+
+
+# ============================================================
+# 5. handle missing year
+# ============================================================
+
+# if the user does not write a year, the chatbot cannot ask the api.
+
+if year is None:
+    print("please include a year.")
+
+
+# ============================================================
+# 6. ask api and print answer
+# ============================================================
+
+else:
+    result = ask_api(year)
+
+    if result.get("students") is not None:
+        print(f"{result['students']} students enrolled in {result['year']}.")
+
+    else:
+        print(result["error"])
+
+
+# ============================================================
+# 7. how to run everything
+# ============================================================
+
+# open terminal 1 and run:
+# uvicorn api_chatbot:app --reload
+
+# keep terminal 1 running.
+
+# open terminal 2 and run:
+# python chatbot.py
+
+# example question:
+# how many students in 2025?
+
+# expected answer:
+# 1650 students enrolled in 2025.
+
+
+# ============================================================
+# summary
+# ============================================================
+
+# chatbot    -> talks with the user
+# api        -> gives data
+# requests   -> python library for calling apis
+# params     -> data sent to the api
+# .json()    -> converts api response into python dictionary
+# input()    -> receives user text
+# split()    -> breaks text into words
+# isdigit()  -> checks whether text is a number
+ 
+
  
