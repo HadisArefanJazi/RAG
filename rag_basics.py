@@ -1,18 +1,17 @@
  
 # ============================================================
-# rag beginner notes
-# file name: rag_basics.py
+# RAG Learning file:
 # ============================================================
 
-# rag stands for retrieval augmented generation.
-# retrieval means finding the most relevant document.
-# augmented means adding that document as extra context.
-# generation means producing an answer using that context.
+# RAG stands for Retrieval Augmented Generation.
+# Retrieval  means finding the most relevant document.
+# Augmented  means adding that document as extra context.
+# Generation means producing an answer using that context.
 
 # simple flow:
 # user question -> search documents -> find best document -> answer from document
 
-# this beginner file only does the retrieval part.
+# this file only does the retrieval part.
 # it finds the best matching school document for a student question.
 
 # install first if needed:
