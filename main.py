@@ -63,7 +63,6 @@ Libraries used:
         - Pinecone
         - Weaviate
 
-    This tutorial keeps everything in memory to stay beginner-friendly.
 """
 
 
@@ -146,7 +145,7 @@ Why chunking matters:
 Small chunks help retrieval find the exact useful part.
 
 Common chunk sizes:
-    - 200 to 500 words for simple documents
+    - 200 to 500  words for simple documents
     - 500 to 1000 words for longer technical documents
 
 This example uses a very simple sentence-based chunker.
@@ -199,24 +198,37 @@ Example:
 
 
 def search_tfidf(question, top_k=3):
-    texts = [chunk["text"] for chunk in chunks]
+    
+    texts           = [chunk["text"] for chunk in chunks]
 
-    vectorizer = TfidfVectorizer(stop_words="english")
+    vectorizer      = TfidfVectorizer(stop_words="english") 
+    
+    # stop_words="english" removes common English words like:  "the", "is", "and", "a"
 
-    chunk_vectors = vectorizer.fit_transform(texts)
-    question_vector = vectorizer.transform([question])
+    chunk_vectors   = vectorizer.fit_transform(texts) 
 
-    scores = cosine_similarity(question_vector, chunk_vectors)[0]
+    # This does two things: fit learns the vocabulary from texts and transform turns each text into a numeric vector.
+    
+    question_vector = vectorizer.transform([question]) 
+    
+    # turns the question into numbers using the same vocabulary learned from texts.
 
-    ranked_indexes = scores.argsort()[::-1]
+    scores          = cosine_similarity(question_vector, chunk_vectors)[0]
 
+    # This compares the question vector against every chunk vector.
+    # The [0] is used because cosine_similarity() returns a 2D array.
+    
+    ranked_indexes  = scores.argsort()[::-1]
+    
+    # scores.argsort() gives lowest to highest. Then [::-1] reverses it.
+    
     results = []
 
     for index in ranked_indexes[:top_k]:
         results.append({
             "source": chunks[index]["source"],
-            "text": chunks[index]["text"],
-            "score": float(scores[index])
+            "text":   chunks[index]["text"],
+            "score":  float(scores[index])
         })
 
     return results
@@ -252,11 +264,11 @@ def search_semantic(question, top_k=3):
             "Run: pip install sentence-transformers"
         )
 
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+    model              = SentenceTransformer("all-MiniLM-L6-v2")
 
-    texts = [chunk["text"] for chunk in chunks]
+    texts              = [chunk["text"] for chunk in chunks]
 
-    chunk_embeddings = model.encode(texts)
+    chunk_embeddings   = model.encode(texts)
     question_embedding = model.encode([question])
 
     scores = cosine_similarity(question_embedding, chunk_embeddings)[0]
@@ -316,8 +328,8 @@ In advanced RAG, rerankers use special models.
 
 Here we use a simple beginner reranker:
     - Prefer chunks that contain important question words.
-
-This is not perfect, but it teaches the idea.
+    
+This is not perfect, but it teaches the idea!
 """
 
 
@@ -349,6 +361,14 @@ def rerank_simple(question, results):
 # ============================================================
 
 """
+Prompt Grounding is where RAG prepares the prompt that will be sent to the LLM.
+
+Before asking the LLM, RAG already searched the documents and found.
+
+The LLM does not search documents itself. 
+
+It only receives a prompt containing the retrieved information and the user's question.
+
 Grounding means forcing the LLM to use only retrieved context.
 
 Good RAG prompt rule:
@@ -365,7 +385,7 @@ def build_grounded_prompt(question, results):
 
     for result in results:
         context += f"Source: {result['source']}\n"
-        context += f"Text: {result['text']}\n\n"
+        context += f"Text:   {result['text']}\n\n"
 
     prompt = f"""
 You are a careful assistant.
