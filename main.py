@@ -605,7 +605,7 @@ def add_document(title, text):
 # ============================================================
 
 if __name__ == "__main__":
-    print("Complete Beginner RAG Tutorial")
+    print("Complete RAG Tutorial")
 
     questions = [
         "when can I cancel housing?",
